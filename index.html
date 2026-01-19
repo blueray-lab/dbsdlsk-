@@ -149,6 +149,52 @@
             document.getElementById('side-panel').classList.remove('open');
         }
 
+        // 🟢 사이드 패널 여는 함수 (업그레이드 버전!)
+        function openPanel(title, date, content, tags, imageSrc) {
+            const panel = document.getElementById('side-panel');
+            const panelContent = document.getElementById('panel-content');
+
+            let html = `
+                <h2 style="font-family:'Mulmaru'; color:blue; border-bottom:2px solid blue; padding-bottom:10px;">${title}</h2>
+                <p style="color:#888; font-size:0.8em; margin-bottom:20px;">${date}</p>
+            `;
+
+            // 1. 사진 있으면 보여주기
+            if(imageSrc) {
+                html += `<img src="${imageSrc}" style="width:100%; margin-bottom:20px; border:1px solid #ddd;">`;
+            }
+
+            // 2. ✨ 핵심! 내용이 '구글 독스 링크'인지 확인하는 마법 ✨
+            if (content.includes("docs.google.com") && content.includes("http")) {
+                // 링크를 '미리보기 모드(/preview)'로 자동 변환! (그래야 깔끔하게 나옴)
+                let docUrl = content.trim();
+                // /edit 또는 /view 로 끝나는 주소를 /preview로 바꿈
+                if(docUrl.includes("/edit")) docUrl = docUrl.split("/edit")[0] + "/preview";
+                else if(docUrl.includes("/view")) docUrl = docUrl.split("/view")[0] + "/preview";
+                
+                // 문서 보여주는 창문(iframe) 만들기
+                html += `
+                    <iframe src="${docUrl}" 
+                            style="width:100%; height:600px; border:1px solid #ccc; border-radius:10px;">
+                    </iframe>
+                    <p style="text-align:center; font-size:12px; margin-top:10px;">
+                        <a href="${content}" target="_blank">📄 새 창에서 문서 열기</a>
+                    </p>
+                `;
+            } else {
+                // 3. 링크가 아니면? 그냥 원래대로 글씨 보여주기
+                html += `
+                    <div style="line-height:1.6; white-space: pre-wrap; margin-bottom:30px;">${content}</div>
+                `;
+            }
+
+            // 태그 추가
+            html += `<div class="tags" style="background:#f0f0f0;"># ${tags}</div>`;
+
+            panelContent.innerHTML = html;
+            panel.classList.add('open');
+        }
+        
         // 👇 실시간 나이 카운터
         function updateLifeClock() {
             const birthDate = new Date("2007-12-20T13:53:00");
