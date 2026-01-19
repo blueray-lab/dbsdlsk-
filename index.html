@@ -51,5 +51,18 @@ body {
                 const div = document.createElement('div');
                 div.style.border = "1px solid black";
                 div.style.marginBottom = "20px";
-                
                 div.innerHTML = `
+                    <div class="post-header">
+                        <span>● ${cols[1]}</span>
+                        <span>${cols[0]}</span>
+                    </div>
+                    <div class="post-body">${cols[2]}</div>
+                    <div class="tags"># ${cols[3]}</div>
+                `;
+                container.appendChild(div);
+            });
+        });
+    </script>
+
+</body>
+</html>
