@@ -5,33 +5,59 @@
     <meta charset="UTF-8">
     <title>이나의 레트로 홈피</title>
     <style>
-        @font-face {
-            font-family: 'Mulmaru';
-            src: url('Mulmaru.ttf');
+        /* 1. 폰트 설정 */
+        @font-face { font-family: 'Mulmaru'; src: url('Mulmaru.ttf'); }
+        @font-face { font-family: '11street'; src: url('11street.ttf'); }
+
+        /* 2. 전체 디자인 */
+        body {
+            font-family: 'Gulim', monospace; /* 기본은 굴림 */
+            padding: 20px;
+            background-image: url('https://i.pinimg.com/736x/a8/4e/22/a84e227c33d5e3e6a0f1295bb74f2f3e.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-attachment: fixed;
         }
-        @font-face {
-        font-family: '11street';
-        src: url('11street.ttf'); 
-    }
-body {
-    font-family: 'Gulim', 'Courier New', monospace;
-    padding: 20px;
-    background-image: url('https://i.pinimg.com/736x/a8/4e/22/a84e227c33d5e3e6a0f1295bb74f2f3e.jpg');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-attachment: fixed;}
+
         .container { max-width: 800px; margin: 0 auto; background: white; border: 1px solid black; padding: 20px; }
         
-        .post-header { 
-            background-color: #FFFF00;
-            border-bottom: 1px solid black; 
-            padding: 5px 10px;
-            display: flex; justify-content: space-between; font-weight: bold;
+        /* 타이머 디자인 */
+        .live-timer-box {
+            background-color: #f0f0f0;
+            border: 1px dashed black;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-family: 'Gulim', monospace;
+            font-size: 14px;
         }
-        .post-body { font-family: '11street'; padding: 15px; line-height: 1.6; white-space: pre-wrap; }
-        .tags { font-size: 12px; color: blue; padding: 10px; border-top: 1px dotted #ccc; }
+
+        /* 제목 폰트 적용 */
         h1 { font-family: 'Mulmaru'; color: #6ca0dc; text-decoration: underline; }
+
+        /* --- ✨ 사이드 패널 디자인 (새로 추가됨!) ✨ --- */
+        #side-panel {
+            position: fixed; top: 0; right: -600px; width: 500px; height: 100%;
+            background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            transition: right 0.4s ease; z-index: 1000; padding: 30px;
+            overflow-y: auto; box-sizing: border-box; font-family: '11street'; /* 내용은 11번가체 */
+        }
+        #side-panel.open { right: 0; } /* 열려라 참깨 */
+        #close-btn {
+            position: absolute; top: 20px; right: 20px;
+            border: none; background: none; font-size: 20px; cursor: pointer;
+        }
+        
+        /* 리스트 아이템 (클릭 가능하게) */
+        .list-item { 
+            cursor: pointer; transition: 0.2s; border: 1px solid black; 
+            margin-bottom: 15px; background: white;
+        }
+        .list-item:hover { transform: translateX(5px); background-color: #f9f9f9; }
+        
+        .post-header { background-color: #FFFF00; border-bottom: 1px solid black; padding: 5px 10px; display: flex; justify-content: space-between; font-weight: bold; }
+        /* ----------------------------------------------- */
     </style>
 </head>
 <body>
@@ -40,7 +66,16 @@ body {
         <h1>우리 같은 종류의 인간은 평생 결코 어른이 되지 못한다</h1>
         <p>Inspired by. 신인아, made by. 윤이나</p>
         
+        <div class="live-timer-box">
+            🌏 지구별 여행 <span id="life-clock" style="color:red; font-weight:bold;">계산 중...</span> 째
+        </div>
+        
         <div id="content-list">Loading...</div>
+    </div>
+
+    <div id="side-panel">
+        <button id="close-btn" onclick="closePanel()">✖ 닫기</button>
+        <div id="panel-content"></div>
     </div>
 
     <script>
@@ -57,20 +92,81 @@ body {
                 const cols = row.split(',');
                 if(cols.length < 3) return;
 
+                const date = cols[0];
+                const title = cols[1];
+                const content = cols[2];
+                const tags = cols[3];
+                const imageSrc = cols[4] ? cols[4].trim() : ''; // 사진 주소 가져오기
+
+                // 리스트 만들기 (제목만 보여줌)
                 const div = document.createElement('div');
-                div.style.border = "1px solid black";
-                div.style.marginBottom = "20px";
+                div.className = "list-item";
                 div.innerHTML = `
                     <div class="post-header">
-                        <span>● ${cols[1]}</span>
-                        <span>${cols[0]}</span>
+                        <span>● ${title}</span>
+                        <span style="font-size:0.8em;">${date}</span>
                     </div>
-                    <div class="post-body">${cols[2]}</div>
-                    <div class="tags"># ${cols[3]}</div>
+                    <div style="padding:15px; color:#666; font-size:0.9em; font-family:'11street';">
+                        클릭해서 내용 보기...
+                    </div>
                 `;
+
+                // 클릭하면 패널 열기!
+                div.onclick = function() {
+                    openPanel(title, date, content, tags, imageSrc);
+                };
+
                 container.appendChild(div);
             });
         });
+
+        // 🟢 패널 열기 함수
+        function openPanel(title, date, content, tags, imageSrc) {
+            const panel = document.getElementById('side-panel');
+            const panelContent = document.getElementById('panel-content');
+
+            let html = `
+                <h2 style="font-family:'Mulmaru'; color:blue; border-bottom:2px solid blue; padding-bottom:10px;">${title}</h2>
+                <p style="color:#888; font-size:0.8em; margin-bottom:20px;">${date}</p>
+            `;
+
+            if(imageSrc) { // 사진 있으면 보여주기
+                html += `<img src="${imageSrc}" style="width:100%; margin-bottom:20px; border:1px solid #ddd;">`;
+            }
+
+            html += `
+                <div style="line-height:1.6; white-space: pre-wrap; margin-bottom:30px;">${content}</div>
+                <div class="tags" style="background:#f0f0f0;"># ${tags}</div>
+            `;
+
+            panelContent.innerHTML = html;
+            panel.classList.add('open');
+        }
+
+        // 🔴 패널 닫기 함수
+        function closePanel() {
+            document.getElementById('side-panel').classList.remove('open');
+        }
+
+        // 👇 실시간 나이 카운터
+        function updateLifeClock() {
+            const birthDate = new Date("2007-12-20T00:00:00");
+            const now = new Date();
+            const diff = now - birthDate;
+
+            const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+            const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 365.25)) / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            const clockElement = document.getElementById("life-clock");
+            if(clockElement) {
+                clockElement.innerText = `${years}년 ${days}일 ${hours}시간 ${minutes}분 ${seconds}초`;
+            }
+        }
+        setInterval(updateLifeClock, 1000);
+        updateLifeClock();
     </script>
 
 </body>
