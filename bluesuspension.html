@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>이나의 레트로 홈피</title>
+    <style>
+        body { font-family: 'Gulim', 'Courier New', monospace; background: #f0f0f0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; border: 1px solid black; padding: 20px; }
+        
+        .post-header { 
+            background-color: #FFFF00;
+            border-bottom: 1px solid black; 
+            padding: 5px 10px;
+            display: flex; justify-content: space-between; font-weight: bold;
+        }
+        .post-body { padding: 15px; line-height: 1.6; white-space: pre-wrap; }
+        .tags { font-size: 12px; color: blue; padding: 10px; border-top: 1px dotted #ccc; }
+        h1 { color: blue; text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>동맹 홈피 만들 사람 구함</h1>
+        <p>환영합니다! 이곳은 이나의 공간입니다.</p>
+        
+        <div id="content-list">Loading...</div>
+    </div>
+
+    <script>
+        // 👇 아래 따옴표("") 안에 아까 복사한 구글 시트 링크를 넣으세요!
+        const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWjp8QuotjjpsrNpjq-f4s5M_YZN-DWW8GXmq2Dz6hNBIQ0dNtk_84ZUUVfO9L-RMN2YxNsc0mheKZ/pub?output=csv"; 
+
+        fetch(sheetUrl)
+        .then(res => res.text())
+        .then(text => {
+            const rows = text.split('\n').slice(1);
+            const container = document.getElementById('content-list');
+            container.innerHTML = '';
+
+            rows.forEach(row => {
+                const cols = row.split(',');
+                if(cols.length < 3) return;
+
+                const div = document.createElement('div');
+                div.style.border = "1px solid black";
+                div.style.marginBottom = "20px";
+                
+                div.innerHTML = `
