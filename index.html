@@ -22,20 +22,20 @@ body {
         }
         .post-body { padding: 15px; line-height: 1.6; white-space: pre-wrap; }
         .tags { font-size: 12px; color: blue; padding: 10px; border-top: 1px dotted #ccc; }
-        h1 { color: blue; text-decoration: underline; }
+        h1 { color: #6ca0dc; text-decoration: underline; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>동맹 홈피 만들 사람 구함</h1>
+        <h1>우리 같은 종류의 인간은 평생 결코 어른이 되지 못한다</h1>
         <p>도둑 맞은 여름</p>
         
         <div id="content-list">Loading...</div>
     </div>
 
     <script>
-        const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWjp8QuotjjpsrNpjq-f4s5M_YZN-DWW8GXmq2Dz6hNBIQ0dNtk_84ZUUVfO9L-RMN2YxNsc0mheKZ/pub?output=csv"; 
+        const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWjp8QuotjjpsrNpjq-f4s5M_YZN-DWW8GXmq2Dz6hNBIQ0dNtk_84ZUUVfO9L-RMN2YxNsc0mheKZ/pub?gid=0&single=true&output=csv"; 
 
         fetch(sheetUrl)
         .then(res => res.text())
